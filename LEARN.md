@@ -54,26 +54,44 @@ cv2.destroyAllWindows()
 
 Another alternative too is SUFT but couldn't run it.
 
-Great! Now let's move on to the stitching images. As we can see in both sift and orbslam, keypoints are generated. We can match features between two coonsecutive images using K-neearest neighbor and classify it based on a lowe's ratio. okay what is lowe's ratio test. 
+The cool thing about these are that they can detect these points even if the images are rotated, scaled, or transformed in some way. So, no matter how the images are aligned, these will still find reliable features.
+
+
+#### Stictching images
+
+Great! Now let's move on to the stitching images. Imagine you have two images that you want to combine into one larger image, like stitching together two halves of a panorama. How is that done?
+
+As we've see in both SIFT and ORBSLAM, keypoints are generated for unique features within the image. Using these,we can match features between two consecutive images using K-neearest neighbor and filter it based on a lowe's ratio. okay what is lowe's ratio test??
 
 $$
 text{lowe's ratio} = \frac {\text{best closest match}} {\text{second best closest match}} 
 $$
 
+Essentially, what the algorithm does is it looks for features in the first image and tries to find similar features in the second image. This is done by comparing the descriptors of the keypoints. Descriptors are like unique fingerprints for each keypoint, capturing the surrounding area’s visual pattern. Matching keypoints is important because you’re trying to find pairs of points that should align in the final stitched image. Not all matches between keypoints are good, though. Some may be misleading due to noise or repetitive patterns in the images. To filter out bad matches, the algorithm uses something called the “ratio test.” based on the lowe's ratio. In simple terms, it compares the best match for a keypoint to the second-best match. If the best match is significantly better (in terms of distance) than the second-best match, the match is considered reliable and is kept. This helps to avoid matching wrong features that could distort the final result.
 
-so based on this ratio, we classify what is great and not. So, basically what we are doing is filtering the features from the classification. and and based on that find the approximate distance between frames using trig. TODO: Im definately bad at explaining this. do it again
+After filtering the keypoints, we create a projective transformation matrix also called the homography matrix. that is a function to project the first keypoint onto the second frame. The relationship between a point $(x_1, y_1)$ in the first image and the corresponding point $(x_2, y_2)$ in the second image can be expressed as:
+
+$$
+\begin{bmatrix} x_2 \\ y_2 \\ 1 \end{bmatrix} = H \cdot \begin{bmatrix} x_1 \\ y_1 \\ 1 \end{bmatrix}
+$$
+
+This Homography matrix tells you how to map the keypoints from the first image to their corresponding points in the second image. Essentially, it’s like finding out how to “stretch” or “shift” the first image so that it fits perfectly with the second image. This is done by solving a set of equations that use the matched keypoints to figure out how to best align the two images.
+
+Once you have the homography, the next step is to apply it. This is done using a process called perspective warping. When you apply the homography, you're transforming the first image into a new version where its keypoints now align with the keypoints in the second image. This is where the magic happens – the first image is warped to fit together with the second image, creating a seamless transition.
+
+Finally, once the first image is warped, you need to combine it with the second image. This is done by placing the warped image onto a larger canvas that can fit both images side by side. The second image is then added where it fits, creating a smooth stitching effect.
+
+and that is it, you've created your own ___"panorama"___ by stitching images based on thier common features.
+
 
 ```python
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 
-img_1 = cv2.imread('images/DSC02930.JPG')
-# plt.imshow(img_1)
-# plt.show()
-img_2 = cv2.imread('images/DSC02931.JPG')
-# plt.imshow(img_2)
-# plt.show()
+img_1 = cv2.imread('image_1.JPG')
+img_2 = cv2.imread('image_2.JPG')
+
 
 img1 = cv2.cvtColor(img_1,cv2.COLOR_BGR2GRAY)
 plt.imshow(img1)
@@ -83,13 +101,14 @@ plt.imshow(img2)
 plt.show()
 
 sift = cv2.SIFT_create() 
-kp1, des1 = sift.detectAndCompute(img1,None)
-kp2, des2 = sift.detectAndCompute(img2,None)
+keypoints_1, descriptors_1 = sift.detectAndCompute(img1,None)
+keypoints_2, descriptors_2 = sift.detectAndCompute(img2,None)
 
 bf = cv2.BFMatcher()
 
-matches = bf.knnMatch(des1,des2, k=2)
+matches = bf.knnMatch(descriptors_1,descriptors_2, k=2)
 
+# ratio test
 good = []
 for m in matches:
     if (m[0].distance < 0.5*m[1].distance):
@@ -98,8 +117,8 @@ matches = np.asarray(good)
 
 
 if (len(matches[:,0]) >= 4):
-    src = np.float32([ kp1[m.queryIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
-    dst = np.float32([ kp2[m.trainIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
+    src = np.float32([ keypoints_1[m.queryIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
+    dst = np.float32([ keypoints_2[m.trainIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
     H, masked = cv2.findHomography(src, dst, cv2.RANSAC, 5.0)
 else:
     raise AssertionError('Can’t find enough keypoints.')
@@ -110,3 +129,5 @@ cv2.imwrite('output.jpg',dst)
 plt.imshow(dst)
 plt.show()
 ```
+
+
