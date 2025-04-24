@@ -64,7 +64,7 @@ Great! Now let's move on to the stitching images. Imagine you have two images th
 As we've see in both SIFT and ORBSLAM, keypoints are generated for unique features within the image. Using these,we can match features between two consecutive images using K-neearest neighbor and filter it based on a lowe's ratio. okay what is lowe's ratio test??
 
 $$
-text{lowe's ratio} = \frac {\text{best closest match}} {\text{second best closest match}} 
+\text{lowe's ratio} = \frac {\text{best closest match}} {\text{second best closest match}} 
 $$
 
 Essentially, what the algorithm does is it looks for features in the first image and tries to find similar features in the second image. This is done by comparing the descriptors of the keypoints. Descriptors are like unique fingerprints for each keypoint, capturing the surrounding area’s visual pattern. Matching keypoints is important because you’re trying to find pairs of points that should align in the final stitched image. Not all matches between keypoints are good, though. Some may be misleading due to noise or repetitive patterns in the images. To filter out bad matches, the algorithm uses something called the “ratio test.” based on the lowe's ratio. In simple terms, it compares the best match for a keypoint to the second-best match. If the best match is significantly better (in terms of distance) than the second-best match, the match is considered reliable and is kept. This helps to avoid matching wrong features that could distort the final result.
