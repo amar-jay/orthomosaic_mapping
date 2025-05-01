@@ -28,4 +28,3 @@ for i, img in enumerate(extracted):
     cv2.imwrite(f"frame_{frame_ids[i]}.jpg", img)
 
 print("Done!")
-

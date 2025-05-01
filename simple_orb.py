@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import os
 
-img = cv2.imread('./simple_image.jpg')
+img = cv2.imread("./simple_image.jpg")
 if img is None:
     print("Error: Image not found or path is incorrect.")
     exit()
@@ -23,7 +23,7 @@ sift = cv2.SIFT_create()
 keypoints = sift.detect(img_gray, None)
 cv2.imshow("sift_output", cv2.drawKeypoints(img, keypoints, None, (255, 0, 255)))
 
-# TODO: why the error ?? 
+# TODO: why the error ??
 # Says so in docs https://docs.opencv.org/3.4/d5/df7/classcv_1_1xfeatures2d_1_1SURF.html
 # Traceback (most recent call last):
 #   File "<FILE>", line 27, in <module>
@@ -39,7 +39,5 @@ cv2.imshow("sift_output", cv2.drawKeypoints(img, keypoints, None, (255, 0, 255))
 # cv2.imshow("suft_output", cv2.drawKeypoints(img, keypoints, None, (255, 0, 255)))
 
 
-
 cv2.waitKey(0)
 cv2.destroyAllWindows()
-
