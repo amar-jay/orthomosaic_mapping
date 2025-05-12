@@ -4,8 +4,8 @@ import os
 
 img = cv2.imread("./simple_image.jpg")
 if img is None:
-    print("Error: Image not found or path is incorrect.")
-    exit()
+	print("Error: Image not found or path is incorrect.")
+	exit()
 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 ################ORBSLAM############################

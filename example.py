@@ -10,8 +10,8 @@ corners = cv2.goodFeaturesToTrack(gray, 1000, 0.01, 1)
 corners = np.int0(corners)
 
 for i in corners:
-    x, y = i.ravel()
-    cv2.circle(img_1, (x, y), 3, (255, 0, 255), -1)
+	x, y = i.ravel()
+	cv2.circle(img_1, (x, y), 3, (255, 0, 255), -1)
 
 cv2.imshow("output", img_1)
 cv2.waitKey(0)

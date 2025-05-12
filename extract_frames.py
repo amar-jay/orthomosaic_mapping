@@ -9,22 +9,22 @@ extracted = []
 
 frame_idx = 0
 while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
-        break
+	ret, frame = cap.read()
+	if not ret:
+		break
 
-    if frame_idx in frame_ids:
-        extracted.append(frame)
-        print(f"Extracted frame {frame_idx}")
-        if len(extracted) == len(frame_ids):
-            break
+	if frame_idx in frame_ids:
+		extracted.append(frame)
+		print(f"Extracted frame {frame_idx}")
+		if len(extracted) == len(frame_ids):
+			break
 
-    frame_idx += 1
+	frame_idx += 1
 
 cap.release()
 
 # Save extracted frames as images
 for i, img in enumerate(extracted):
-    cv2.imwrite(f"frame_{frame_ids[i]}.jpg", img)
+	cv2.imwrite(f"frame_{frame_ids[i]}.jpg", img)
 
 print("Done!")
